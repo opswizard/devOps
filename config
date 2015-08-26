@@ -1,0 +1,6 @@
+#!/bin/bash
+
+_SCRIPT_PATH=$(dirname $0)
+_SFTP_PATH="/srv/sftp"
+_SFTP_GROUP="sftpuser"
+_SFTP_UPLOADS_DIRNAME="uploads"

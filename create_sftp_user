@@ -1,0 +1,36 @@
+#!/bin/bash
+
+source config
+source functions
+
+## OpsWizard free code
+## See more on http://opswizard.blogspot.pt
+
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must run as root! Aborting..."
+  exit 1
+fi
+
+if [[ -z $1 ]]; then
+  echo "Usage: $0 <new_sftp_username>"
+  exit 1
+fi
+
+new_username=$1
+user_exists=$(getent passwd $new_username)
+if [[ -n $user_exists ]]; then
+  echo "$new_username already exists in the system, can't create it again!"
+  exit 1
+fi
+
+new_user_home="$_SFTP_PATH/$new_username"
+new_uploads_path="$new_user_home/$_SFTP_UPLOADS_DIRNAME"
+new_user_password=$(random 12)
+
+mkdir -p $new_uploads_path
+useradd -M -s /bin/false -d $new_user_home -g $_SFTP_GROUP $new_username
+echo "$new_username:$new_user_password" | chpasswd
+chown $new_username:$_SFTP_GROUP $new_uploads_path
+
+echo "Done."
+echo "user sftp user '$new_username' created with password $new_user_password"
